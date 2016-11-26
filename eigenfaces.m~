@@ -32,32 +32,7 @@ for subject = subjects'
     end
 end
 
-% Calculate eigenfaces
-
-for subject=1:1%NUMBER_OF_SUBJECTS
-   for image=1:1%IMAGES_PER_SUBJECT
-       x = dataset_v{subject,image};
-       [h,w,n] = size(dataset{subject,image});
-       x = double(x);
-       x = bsxfun(@minus, x, mean(x,2));
-       s = cov(x');
-       [V,D] = eig(s);
-       eigval = diag(D);
-       % sort eigenvalues in descending order
-       eigval = eigval(end:-1:1);
-       V = fliplr(V);
-       % show 0th through 15th principal eigenvectors
-       eig0 = reshape(mean(x,2), [h,w]);
-       % eig0 = repmat(mean(x,2), [h,w]);
-       figure,subplot(4,4,1)
-       imagesc(eig0)
-       colormap gray
-       for k = 1:15
-           subplot(4,4,k+1)
-           imagesc(reshape(V(:,k),h,w))
-       end
-   end
-end
+for i=1:NUMBER_OF_SUBJECTS
 
 % Example indexing dataset
 subject_number = 5;
