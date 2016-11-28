@@ -1,0 +1,14 @@
+	
+given set of facesthe object is face recognition. we project the faces to new fielad of eigen faces which are actualy eigen vectors the same as PCA algorithm 
+THANKS TO THE SITE http://fewtutorials.bravesites.com/tutorials 
+steps 
+1) resize all M faces to N*N 
+2) remove average 
+3) create matrix A of faces each row N*N 
+totla size of A is (N*N) * M 
+4) calculate average face 
+5) remove average face from A 
+6) compute the covariance matrix C A'*A , C size is M*M 
+7) compute eigen values and eigen vectors , to compute the eigne faces need to go bacj to higher dimension 
+8) compute the linear combination of each original face 
+9( given new face project it to eigen face and compute distance to each eigen face this is the recognition.
