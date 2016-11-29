@@ -14,6 +14,7 @@ subjects = dir('orl_faces/*');
 NUMBER_OF_SUBJECTS = 40;
 IMAGES_PER_SUBJECT = 10;
 NUMBER_OF_IMAGES = NUMBER_OF_SUBJECTS * IMAGES_PER_SUBJECT;
+IMAGE_SCALE = .3;
 
 
 dataset = cell(NUMBER_OF_SUBJECTS, IMAGES_PER_SUBJECT);
@@ -31,7 +32,7 @@ for subject = subjects'
             if(~strcmp(image.name,'.') && ~strcmp(image.name,'..'))
                 image_path = strcat('orl_faces/',subject.name,'/',image.name);
                 image_number = sscanf(image.name,'%d.pgm');
-                dataset(subject_number,image_number)={imread(image_path)};
+                dataset(subject_number,image_number)={imresize(imread(image_path),IMAGE_SCALE)};
                 dataset_v(subject_number,image_number)={dataset{subject_number,image_number}(:).'};
                 vec(image_num) = dataset_v(subject_number,image_number);
                 image_num = image_num + 1;
@@ -58,21 +59,12 @@ eigval = diag(D);
 eigval = eigval(end:-1:1);
 V = fliplr(V);
 % show 0th through 15th principal eigenvectors
-% eig0 = reshape(mean(x,2), [h,w]);
 eig0 = repmat(mean(x,2), [h,w]);
 figure,subplot(4,4,1)
 imagesc(eig0)
 colormap gray
 for k = 1:15
     subplot(4,4,k+1)
-    %repmat(V(:,k), [h,w]);
     imagesc(reshape(V(:,k),h,w))
 end
-
-
-% Example indexing dataset
-subject_number = 5;
-image_number = 8;
-
-imshow(dataset{subject_number,image_number})
 
