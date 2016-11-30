@@ -7,7 +7,6 @@
 clear all;
 close all;
 
-
 % Open ORL database of faces
 subjects = dir('orl_faces/*');
 
@@ -19,7 +18,6 @@ IMAGE_SCALE = .3;
 
 % containers for data
 dataset = cell(NUMBER_OF_SUBJECTS, IMAGES_PER_SUBJECT);
-dataset_v = cell(NUMBER_OF_SUBJECTS, IMAGES_PER_SUBJECT); % can probably get rid of this?
 vec = cell(NUMBER_OF_IMAGES);
 
 image_num = 1;
@@ -34,8 +32,7 @@ for subject = subjects'
                 image_path = strcat('orl_faces/',subject.name,'/',image.name);
                 image_number = sscanf(image.name,'%d.pgm');
                 dataset(subject_number,image_number)={imresize(imread(image_path),IMAGE_SCALE)};
-                dataset_v(subject_number,image_number)={dataset{subject_number,image_number}(:).'}; % Not needed?
-                vec(image_num) = dataset_v(subject_number,image_number);
+                vec(image_num) = {dataset{subject_number,image_number}(:).'};
                 image_num = image_num + 1;
             end
         end
@@ -47,7 +44,7 @@ end
 [h,w] = size(dataset{1,1}); % Get size of image
 
 % Put into matrix of a known size
-x = zeros(h*w,NUMBER_OF_IMAGES);
+x = zeros(h*w,NUMBER_OF_IMAGES-1);
 for image = 1:NUMBER_OF_IMAGES
    x(:,image) = vec{image}; 
 end
@@ -76,4 +73,6 @@ for k = 1:15
     subplot(4,4,k+1)
     imagesc(reshape(V(:,k),h,w))
 end
+
+
 
