@@ -6,6 +6,7 @@
 
 clear all;
 close all;
+%% Load Data Set
 
 % Open ORL database of faces
 subjects = dir('orl_faces/*');
@@ -39,12 +40,12 @@ for subject = subjects'
     end
 end
 
-% Calculate eigenfaces
+%% Calculate eigenfaces
 
 [h,w] = size(dataset{1,1}); % Get size of image
-
+d= h*w;
 % Put into matrix of a known size
-x = zeros(h*w,NUMBER_OF_IMAGES-1);
+x = zeros(d,NUMBER_OF_IMAGES-1);
 for image = 1:NUMBER_OF_IMAGES
    x(:,image) = vec{image}; 
 end
@@ -72,6 +73,17 @@ colormap gray
 for k = 1:15
     subplot(4,4,k+1)
     imagesc(reshape(V(:,k),h,w))
+end
+
+eigsum= sum(eigval);
+csum= 0;
+for i= 1:d
+    csum= csum + eigval(i);
+    tv= csum/eigsum;
+    if tv>0.95
+        k95= i;
+        break;
+    end
 end
 
 
