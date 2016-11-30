@@ -86,5 +86,13 @@ for i= 1:d
     end
 end
 
+%% Identify new face
 
+% Load new face image and manipulate into column vector
+face= imresize(imread('S11.pgm'), IMAGE_SCALE);
+face= face(:).';
+face= face';
 
+%Calculate eigenface
+face= double(face);
+face= face-(sum(face)/d);
