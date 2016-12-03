@@ -15,7 +15,7 @@ subjects = dir('orl_faces/*');
 NUMBER_OF_SUBJECTS = 40;
 IMAGES_PER_SUBJECT = 10;
 NUMBER_OF_IMAGES = NUMBER_OF_SUBJECTS * IMAGES_PER_SUBJECT;
-IMAGE_SCALE = .5;
+IMAGE_SCALE = .3;
 
 % containers for data
 dataset = cell(NUMBER_OF_SUBJECTS, IMAGES_PER_SUBJECT);
@@ -99,10 +99,10 @@ end
 %face= face';
 face = double(vec{NUMBER_OF_IMAGES})';
 
-wn = double(zeros(k95,1));
+w = double(zeros(k95,1));
 Wm = zeros(NUMBER_OF_IMAGES-1,k95);
 for i = 1:k95 
-   wn(i) = V(i,:)*(face-m);
+   w(i) = V(i,:)*(face-m);
    for j = 1:NUMBER_OF_IMAGES-1
        Wm(j,i) = V(i,:)*((double(vec{j})')-m);
    end
@@ -110,7 +110,7 @@ end
 
 d = zeros(NUMBER_OF_IMAGES-1,1);
 for j = 1:NUMBER_OF_IMAGES-1
-    d(j) = norm(wn,Wm(j));
+    d(j) = norm(w,Wm(j));
 end
 
 [M,I] = min(d);
@@ -119,10 +119,10 @@ M
 
 figure;
 subplot(1,2,1)
-imshow(uint8(reshape(vec{NUMBER_OF_IMAGES},h,w)))
+imshow(testImage)
 title('Test face')
 subplot(1,2,2)
-imshow(uint8(reshape(vec{I},h,w)))
+imshow(uint8(images(:,:,index)))
 title('Recognized face')
 
 %Calculate eigenface
