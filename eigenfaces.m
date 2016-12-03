@@ -15,7 +15,7 @@ subjects = dir('orl_faces/*');
 NUMBER_OF_SUBJECTS = 40;
 IMAGES_PER_SUBJECT = 10;
 NUMBER_OF_IMAGES = NUMBER_OF_SUBJECTS * IMAGES_PER_SUBJECT;
-IMAGE_SCALE = .2;
+IMAGE_SCALE = .5;
 
 % containers for data
 dataset = cell(NUMBER_OF_SUBJECTS, IMAGES_PER_SUBJECT);
@@ -46,7 +46,7 @@ correct = 0;
 incorrect = 0;
 
 %% Cross Validition
-for test_image = 1:10:NUMBER_OF_IMAGES-1
+for test_image = 1:NUMBER_OF_IMAGES-1
 
     %% Calculate eigenfaces
 
@@ -82,10 +82,10 @@ for test_image = 1:10:NUMBER_OF_IMAGES-1
     % show 0th through 15th principal eigenvectors
 %     eig0 = repmat(m, [h,w]);
 %     figure,subplot(4,4,1)
-%     imagesc(eig0)
+%     %imagesc(eig0)
 %     colormap gray
-%     for k = 1:15
-%         subplot(4,4,k+1)
+%     for k = 1:16
+%         subplot(4,4,k)
 %         imagesc(reshape(V(:,k),h,w))
 %     end
 
@@ -134,20 +134,6 @@ for test_image = 1:10:NUMBER_OF_IMAGES-1
     
     if(floor((I-1)/10) == floor((test_image-1)/10))
         correct = correct + 1;
-        figure;
-        subplot(1,2,1)
-        imshow(uint8(reshape(vec{test_image},h,w)))
-        title('Test face')
-        subplot(1,2,2)
-        imshow(uint8(reshape(vec{I},h,w)))
-        title('Recognized face')
-    else
-        fprintf('Face incorrectly classified!\n')
-        fprintf('Got image number:        %i\n', I)
-        fprintf('Test image number:       %i\n', test_image)
-        fprintf('Got image subject:       %i\n', floor((I-1)/IMAGES_PER_SUBJECT))
-        fprintf('Correct image subject:   %i\n', floor((test_image-1)/IMAGES_PER_SUBJECT))
-        incorrect = incorrect + 1;
 %         figure;
 %         subplot(1,2,1)
 %         imshow(uint8(reshape(vec{test_image},h,w)))
@@ -155,9 +141,23 @@ for test_image = 1:10:NUMBER_OF_IMAGES-1
 %         subplot(1,2,2)
 %         imshow(uint8(reshape(vec{I},h,w)))
 %         title('Recognized face')
+    else
+        fprintf('Face incorrectly classified!\n')
+        fprintf('--Got image number:        %i\n', I)
+        fprintf('--Test image number:       %i\n', test_image)
+        fprintf('--Got image subject:       %i\n', floor((I-1)/IMAGES_PER_SUBJECT))
+        fprintf('--Correct image subject:   %i\n', floor((test_image-1)/IMAGES_PER_SUBJECT))
+        incorrect = incorrect + 1;
+        figure;
+        subplot(1,2,1)
+        imshow(uint8(reshape(vec{test_image},h,w)))
+        title('Test face')
+        subplot(1,2,2)
+        imshow(uint8(reshape(vec{I},h,w)))
+        title('Recognized face')
     end
 end
 
 fprintf('Number correctly classified:   %i\n', correct)
 fprintf('Number incorrectly classified: %i\n', incorrect)
-fprintf('Percent correctly classified:  %i\n', correct/(correct+incorrect)*100)
+fprintf('Percent correctly classified:  %f\n', correct/(correct+incorrect)*100)
