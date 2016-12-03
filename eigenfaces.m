@@ -42,84 +42,124 @@ for subject = subjects'
     end
 end
 
-%% Calculate eigenfaces
+correct = 0;
+incorrect = 0;
 
-[h,w] = size(dataset{1,1}); % Get size of image
-d= h*w;
-% Put into matrix of a known size
-x = zeros(d,NUMBER_OF_IMAGES-1);
-for image = 1:NUMBER_OF_IMAGES-1
-   x(:,image) = vec{image}; 
-end
-x = double(x);
+%% Cross Validition
+for test_image = 1:10:NUMBER_OF_IMAGES-1
 
-% Subtract mean
-m = mean(x,2);
-x = bsxfun(@minus, x, m);
+    %% Calculate eigenfaces
 
-% calculate covariance
-s = cov(x');
-
-% obtain eigenvalue & eigenvector
-[V,D] = eig(s);
-eigval = diag(D);
-
-% sort eigenvalues in descending order
-eigval = eigval(end:-1:1);
-V = fliplr(V);
-
-% show 0th through 15th principal eigenvectors
-eig0 = repmat(m, [h,w]);
-figure,subplot(4,4,1)
-imagesc(eig0)
-colormap gray
-for k = 1:15
-    subplot(4,4,k+1)
-    imagesc(reshape(V(:,k),h,w))
-end
-
-eigsum= sum(eigval);
-csum= 0;
-for i= 1:d
-    csum= csum + eigval(i);
-    tv= csum/eigsum;
-    if tv>0.95
-        k95= i;
-        break;
+    [h,w] = size(dataset{1,1}); % Get size of image
+    d= h*w;
+    % Put into matrix of a known size
+    x = zeros(d,NUMBER_OF_IMAGES-1);
+    offset = 0;
+    for image = 1:NUMBER_OF_IMAGES
+        if image == test_image
+            offset = 1;
+            image = image + 1;
+        end
+       x(:,image-offset) = vec{image}; 
     end
+    x = double(x);
+
+    % Subtract mean
+    m = mean(x,2);
+    x = bsxfun(@minus, x, m);
+
+    % calculate covariance
+    s = cov(x');
+
+    % obtain eigenvalue & eigenvector
+    [V,D] = eig(s);
+    eigval = diag(D);
+
+    % sort eigenvalues in descending order
+    eigval = eigval(end:-1:1);
+    V = fliplr(V);
+
+    % show 0th through 15th principal eigenvectors
+    eig0 = repmat(m, [h,w]);
+    %figure,subplot(4,4,1)
+    %imagesc(eig0)
+    %colormap gray
+%     for k = 1:15
+%         subplot(4,4,k+1)
+%         imagesc(reshape(V(:,k),h,w))
+%     end
+
+    eigsum= sum(eigval);
+    csum= 0;
+    for i= 1:d
+        csum= csum + eigval(i);
+        tv= csum/eigsum;
+        if tv>0.95
+            k95= i;
+            break;
+        end
+    end
+
+    %% Identify new face
+
+    % Load new face image and manipulate into column vector
+    % For now just taking image from loaded dataset
+    face = double(vec{test_image})';
+
+    % Compute the weights for every image
+    wn = double(zeros(k95,1));
+    Wm = zeros(NUMBER_OF_IMAGES-1,k95);
+    for i = 1:k95 
+       wn(i) = V(:,i)'*(face-m);
+       offset = 0;
+       for j = 1:NUMBER_OF_IMAGES
+           if j == test_image
+                offset = 1;
+                j = j + 1;
+            end
+           Wm(j-offset,i) = V(:,i)'*((double(vec{j})')-m);
+       end
+    end
+
+    d = zeros(NUMBER_OF_IMAGES-1,1);
+    for j = 1:NUMBER_OF_IMAGES-1
+        d(j) = norm(wn-Wm(j,:)');
+    end
+
+    [M,I] = min(d);
+    
+    if(I > test_image)
+       I = I + 1; 
+    end
+    
+    if(floor((I-1)/10) == floor((test_image-1)/10))
+        correct = correct + 1;
+        figure;
+        subplot(1,2,1)
+        imshow(uint8(reshape(vec{test_image},h,w)))
+        title('Test face')
+        subplot(1,2,2)
+        imshow(uint8(reshape(vec{I},h,w)))
+        title('Recognized face')
+    else
+        I
+        test_image
+        floor((I-1)/10)
+        floor((test_image-1)/10)
+        incorrect = incorrect + 1;
+        figure;
+        subplot(1,2,1)
+        imshow(uint8(reshape(vec{test_image},h,w)))
+        title('Test face')
+        subplot(1,2,2)
+        imshow(uint8(reshape(vec{I},h,w)))
+        title('Recognized face')
+    end
+    %I
+    %M
+
+    
+
 end
 
-
-
-%% Identify new face
-
-% Load new face image and manipulate into column vector
-% For now just taking image from loaded dataset
-face = double(vec{NUMBER_OF_IMAGES})';
-
-% Compute the weights for every image
-wn = double(zeros(k95,1));
-Wm = zeros(NUMBER_OF_IMAGES-1,k95);
-for i = 1:k95 
-   wn(i) = V(:,i)'*(face-m);
-   for j = 1:NUMBER_OF_IMAGES-1
-       Wm(j,i) = V(:,i)'*((double(vec{j})')-m);
-   end
-end
-
-d = zeros(NUMBER_OF_IMAGES-1,1);
-for j = 1:NUMBER_OF_IMAGES-1
-    d(j) = norm(wn-Wm(j,:)');
-end
-
-[M,I] = min(d);
-I
-M
-
-figure;
-subplot(1,2,1)
-imshow(uint8(reshape(vec{NUMBER_OF_IMAGES},h,w)))
-title('Test face')
-subplot(1,2,2)
-imshow(uint8(reshape(vec{I},h,w)))
-title('Recognized face')
+correct/(correct+incorrect)
