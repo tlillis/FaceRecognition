@@ -94,23 +94,22 @@ end
 %% Identify new face
 
 % Load new face image and manipulate into column vector
-%face= imresize(imread('S11.pgm'), IMAGE_SCALE);
-%face= face(:).';
-%face= face';
+% For now just taking image from loaded dataset
 face = double(vec{NUMBER_OF_IMAGES})';
 
+% Compute the weights for every image
 wn = double(zeros(k95,1));
 Wm = zeros(NUMBER_OF_IMAGES-1,k95);
 for i = 1:k95 
-   wn(i) = V(i,:)*(face-m);
+   wn(i) = V(:,i)'*(face-m);
    for j = 1:NUMBER_OF_IMAGES-1
-       Wm(j,i) = V(i,:)*((double(vec{j})')-m);
+       Wm(j,i) = V(:,i)'*((double(vec{j})')-m);
    end
 end
 
 d = zeros(NUMBER_OF_IMAGES-1,1);
 for j = 1:NUMBER_OF_IMAGES-1
-    d(j) = norm(wn,Wm(j));
+    d(j) = norm(wn-Wm(j,:)');
 end
 
 [M,I] = min(d);
@@ -124,7 +123,3 @@ title('Test face')
 subplot(1,2,2)
 imshow(uint8(reshape(vec{I},h,w)))
 title('Recognized face')
-
-%Calculate eigenface
-% face= double(face);
-% face= face-(sum(face)/d);
